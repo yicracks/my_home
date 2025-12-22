@@ -1,0 +1,5 @@
+{
+  "name": "HK Aura 3D Visualizer",
+  "description": "A 3D interactive replica of the Harman Kardon Aura Studio speaker with dynamic lighting and music visualization.",
+  "requestFramePermissions": []
+}
