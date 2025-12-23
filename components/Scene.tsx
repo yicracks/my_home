@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import * as THREE from 'three';
 import { useFrame, ThreeEvent } from '@react-three/fiber';
 import { ContactShadows, Environment, OrbitControls, PerspectiveCamera, Text } from '@react-three/drei';
@@ -180,6 +180,22 @@ export const Scene: React.FC<SceneProps> = ({
   const [targetCameraPos, setTargetCameraPos] = useState<THREE.Vector3 | null>(null);
   const [targetControlsTarget, setTargetControlsTarget] = useState<THREE.Vector3 | null>(null);
 
+  // Handle Space key to reset view
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.code === 'Space') {
+        event.preventDefault(); // Prevent scrolling if page has scrollbars
+        setTargetCameraPos(new THREE.Vector3(0, 15, 25));
+        setTargetControlsTarget(new THREE.Vector3(0, 0, 0));
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, []);
+
   useFrame((state, delta) => {
     // Smoothly animate Camera position if target is set
     if (targetCameraPos) {
@@ -217,7 +233,7 @@ export const Scene: React.FC<SceneProps> = ({
       setTargetControlsTarget(newTarget);
   };
 
-  const FURNITURE_SCALE = 1.7;
+  const FURNITURE_SCALE = 0.9;
 
   return (
     <>

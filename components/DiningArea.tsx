@@ -145,4 +145,12 @@ export const DiningArea: React.FC<DiningAreaProps> = ({ isTreeOn, toggleTree }) 
             {/* Table Items */}
             <Vase position={[0, 0.8, 0]} />
             <VodkaBottle position={[0.5, 0.8, 0.5]} />
-            <WineGlass position={[
+            <WineGlass position={[0.8, 0.8, 0.2]} />
+
+            {/* Christmas Tree (Back Corner) */}
+            <group position={[7.5, 0, -7.5]} scale={1.8}>
+                <ChristmasTree isOn={isTreeOn} toggle={toggleTree} />
+            </group>
+        </group>
+    )
+}

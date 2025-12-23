@@ -9,38 +9,50 @@ interface ChristmasTreeProps {
 
 export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isOn, toggle }) => {
   // --- Create Layers for "Branch" Effect ---
-  // Instead of 3 big cones, we make ~8 stacked cones decreasing in size
+  // More layers for a dense, classic look
   const layers = useMemo(() => {
     const items = [];
-    const count = 7;
+    const count = 10; // Increased layer count
     for (let i = 0; i < count; i++) {
-        // Base width gets smaller as we go up
-        // i=0 (bottom): width ~0.8
-        // i=count (top): width ~0.2
         const progress = i / count;
-        const radius = 0.6 - (progress * 0.45); 
-        const height = 0.4;
-        const y = 0.4 + (i * 0.25); // Overlap layers
+        // Base radius wider at bottom
+        const radius = 0.8 - (progress * 0.65); 
+        const height = 0.45;
+        const y = 0.3 + (i * 0.22); // Overlap layers significantly
         items.push({ position: [0, y, 0], radius, height });
     }
     return items;
   }, []);
 
-  // --- Generate Lights on the Tree Surface ---
-  const lightCount = 40;
+  // --- Ornaments (Balls) ---
+  const ornamentCount = 50;
+  const ornaments = useMemo(() => {
+      const items = [];
+      const colors = ["#d32f2f", "#ffb300", "#ff6f00"]; // Red, Gold, Amber
+      for(let i=0; i<ornamentCount; i++) {
+          const y = 0.4 + Math.random() * 2.0;
+          // Radius roughly follows tree shape
+          const layerR = 0.8 - ((y - 0.3) / 2.2) * 0.65;
+          const r = layerR + 0.05; 
+          const theta = Math.random() * Math.PI * 2;
+          
+          items.push({
+              position: [r * Math.cos(theta), y, r * Math.sin(theta)] as [number, number, number],
+              color: colors[Math.floor(Math.random() * colors.length)],
+              scale: 0.04 + Math.random() * 0.03
+          });
+      }
+      return items;
+  }, []);
+
+  // --- Lights ---
+  const lightCount = 60;
   const lightData = useMemo(() => {
     const data = [];
     for (let i = 0; i < lightCount; i++) {
-        // Distribute lights vertically along the tree
-        // Tree foliage goes from y=0.4 to y ~2.2
-        const y = 0.5 + Math.random() * 1.5;
-        
-        // Approximate radius at this height (linear interpolation of tree shape)
-        // Bottom r=0.6 at y=0.4, Top r=0 at y=2.2
-        const shapeRatio = (2.2 - y) / 1.8; 
-        const maxR = shapeRatio * 0.6;
-        const r = maxR + 0.02; // Sit slightly outside
-
+        const y = 0.5 + Math.random() * 2.0;
+        const layerR = 0.8 - ((y - 0.3) / 2.2) * 0.65;
+        const r = layerR + 0.02; 
         const theta = Math.random() * Math.PI * 2;
         
         data.push({
@@ -59,7 +71,6 @@ export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isOn, toggle }) =>
       if (isOn && lightsRef.current) {
           lightsRef.current.children.forEach((mesh, i) => {
               const data = lightData[i];
-              // Blinking effect
               const intensity = (Math.sin(state.clock.elapsedTime * data.speed + data.offset) + 1) / 2;
               
               const mat = (mesh as THREE.Mesh).material as THREE.MeshStandardMaterial;
@@ -77,37 +88,68 @@ export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isOn, toggle }) =>
   return (
     <group onClick={(e) => { e.stopPropagation(); toggle(); }}>
       {/* Tree Base / Pot */}
-      <mesh position={[0, 0.15, 0]}>
+      <mesh position={[0, 0.15, 0]} castShadow>
          <cylinderGeometry args={[0.2, 0.15, 0.3, 8]} />
-         <meshStandardMaterial color="#8d6e63" />
+         <meshStandardMaterial color="#5d4037" roughness={0.9} />
       </mesh>
       
       {/* Trunk (Central) */}
       <mesh position={[0, 1.0, 0]}>
-         <cylinderGeometry args={[0.08, 0.08, 1.5]} />
+         <cylinderGeometry args={[0.1, 0.1, 2.0]} />
          <meshStandardMaterial color="#3e2723" />
       </mesh>
 
       {/* Foliage Layers (Branches) */}
       {layers.map((layer, idx) => (
-          <mesh key={idx} position={[0, layer.position[1], 0]} castShadow>
-             <coneGeometry args={[layer.radius, layer.height, 16]} />
-             <meshStandardMaterial color="#1b5e20" roughness={0.9} />
+          <group key={idx} position={[0, layer.position[1], 0]}>
+             {/* Main Green Part */}
+             <mesh castShadow>
+                <coneGeometry args={[layer.radius, layer.height, 16]} />
+                <meshStandardMaterial color="#1b5e20" roughness={0.8} />
+             </mesh>
+             {/* Snow Tip (Slightly larger, wider, white cone at bottom or ring?) */}
+             {/* Let's try a white torus at the base of the cone to simulate snow on tips */}
+             <mesh position={[0, -layer.height/2 + 0.02, 0]} rotation={[Math.PI/2, 0, 0]}>
+                 <torusGeometry args={[layer.radius - 0.02, 0.03, 8, 16]} />
+                 <meshStandardMaterial color="#ffffff" roughness={1} />
+             </mesh>
+             {/* Random white blobs for snow on branches */}
+             {[0,1,2].map(k => (
+                 <mesh key={k} position={[
+                     (Math.random()-0.5)*layer.radius, 
+                     (Math.random()-0.5)*layer.height*0.5, 
+                     (Math.random()-0.5)*layer.radius
+                 ]}>
+                     <sphereGeometry args={[0.04]} />
+                     <meshStandardMaterial color="white" />
+                 </mesh>
+             ))}
+          </group>
+      ))}
+
+      {/* Ornaments */}
+      {ornaments.map((o, i) => (
+          <mesh key={`ornament-${i}`} position={o.position} castShadow>
+              <sphereGeometry args={[o.scale, 16, 16]} />
+              <meshStandardMaterial color={o.color} metalness={0.7} roughness={0.2} />
           </mesh>
       ))}
       
-      {/* Star */}
-      <mesh position={[0, 2.2, 0]} rotation={[0, 0, 0.2]}>
-          <octahedronGeometry args={[0.12]} />
-          <meshStandardMaterial color="gold" emissive="gold" emissiveIntensity={isOn ? 2 : 0} />
-      </mesh>
+      {/* Star - Larger, 5-pointed */}
+      <group position={[0, 2.45, 0]} rotation={[0, 0, 0]}>
+          <mesh scale={[1.5, 1.5, 0.5]}>
+             {/* Simple star approximation using Dodecahedron or customized shape. Let's use a flat cylinder or sphere with specific material */}
+             <cylinderGeometry args={[0.2, 0.05, 0.05, 5]} />
+             <meshStandardMaterial color="#ffd700" emissive="#ffd700" emissiveIntensity={isOn ? 0.8 : 0} metalness={1} roughness={0.3} />
+          </mesh>
+          <pointLight intensity={isOn ? 1 : 0} distance={2} color="gold" />
+      </group>
 
       {/* Lights Group */}
       <group ref={lightsRef}>
           {lightData.map((d, i) => (
              <mesh key={i} position={d.position}>
-                 {/* Bulb Shape: Capsule or elongated sphere */}
-                 <capsuleGeometry args={[0.02, 0.05, 4, 8]} />
+                 <sphereGeometry args={[0.02, 8, 8]} />
                  <meshStandardMaterial 
                     color={d.color} 
                     roughness={0.2}
@@ -119,7 +161,7 @@ export const ChristmasTree: React.FC<ChristmasTreeProps> = ({ isOn, toggle }) =>
       </group>
       
       {/* Area Glow */}
-      {isOn && <pointLight position={[0, 1.0, 0]} intensity={2.0} distance={5} color="#ffaa00" decay={2} />}
+      {isOn && <pointLight position={[0, 1.2, 0]} intensity={1.5} distance={6} color="#ffaa00" decay={2} />}
     </group>
   );
 };
