@@ -284,7 +284,11 @@ export const KitchenArea = () => {
                      </mesh>
                  </group>
                  
-                 <group position={[0, 1.1, 0.45]}>
+                 {/* 
+                    Fixed: Moved internal shelving group from z=0.45 to z=0 
+                    to ensure shelves are contained within the 1.0 depth fridge body (z -0.5 to +0.5).
+                 */}
+                 <group position={[0, 1.1, 0]}>
                       {/* Central Divider */}
                       <mesh>
                           <boxGeometry args={[0.05, 2.1, 0.1]} />

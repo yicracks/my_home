@@ -8,76 +8,113 @@ interface BedroomAreaProps {
 }
 
 export const BedroomArea: React.FC<BedroomAreaProps> = ({ isLampOn, toggleLamp }) => {
+  const leatherMaterial = (
+      <meshStandardMaterial 
+          color="#1a1a1a" 
+          roughness={0.4} 
+          metalness={0.2} 
+      />
+  );
+
   return (
     <group>
-      {/* --- Bed --- */}
+      {/* --- Luxury Bed --- */}
       <group position={[0, 0, 0]}>
-         {/* Bed Frame (Wider King Size: 2.2 -> 3.0) */}
-         <mesh position={[0, 0.25, 0]} castShadow>
-            <boxGeometry args={[3.0, 0.5, 3.2]} />
-            <meshStandardMaterial color="#5d4037" roughness={0.6} />
-         </mesh>
-         
-         {/* Mattress (Wider) - White */}
-         <mesh position={[0, 0.6, 0]}>
-            <boxGeometry args={[2.8, 0.3, 3]} />
-            <meshStandardMaterial color="#ffffff" />
-         </mesh>
-         
-         {/* Fluffy Duvet / Quilt */}
-         {/* Using RoundedBox with high radius/smoothness to mimic soft fabric draping */}
-         {/* Size increased to be larger than bed frame [3.0, 3.2] -> [3.4, 3.5] */}
+         {/* Low Profile Bed Base (Black Leather) */}
+         {/* Wider than mattress, low to ground */}
          <RoundedBox 
-            args={[3.4, 0.6, 3.5]} 
-            radius={0.3} // High radius for puffiness
-            smoothness={8} 
-            position={[0, 0.7, 0.2]} 
+            args={[3.4, 0.4, 3.5]} 
+            radius={0.1} 
+            smoothness={4} 
+            position={[0, 0.2, 0]} 
             castShadow
          >
-            <meshStandardMaterial color="#ffffff" roughness={1} /> 
+            {leatherMaterial}
          </RoundedBox>
-
-         {/* Headboard (Wider) */}
-         <mesh position={[0, 1, -1.55]} castShadow>
-             <boxGeometry args={[3.2, 1.5, 0.1]} />
-             <meshStandardMaterial color="#5d4037" roughness={0.6} />
-         </mesh>
          
-         {/* Soft Pillows - White */}
-         <group position={[0, 0.85, -1.1]} rotation={[0.1, 0, 0]}>
+         {/* Split Headboard (Black Leather) */}
+         {/* Slightly Angled back */}
+         <group position={[0, 0.8, -1.6]} rotation={[-0.1, 0, 0]}>
              <RoundedBox 
-                args={[0.9, 0.3, 0.5]} 
-                radius={0.15} 
-                smoothness={8} 
-                position={[-0.6, 0, 0]}
+                args={[1.5, 1.2, 0.3]} 
+                radius={0.1} 
+                smoothness={4} 
+                position={[-0.8, 0, 0]} 
+                castShadow
              >
-                 <meshStandardMaterial color="#ffffff" roughness={0.9} />
+                {leatherMaterial}
              </RoundedBox>
              <RoundedBox 
-                args={[0.9, 0.3, 0.5]} 
-                radius={0.15} 
-                smoothness={8} 
-                position={[0.6, 0, 0]}
+                args={[1.5, 1.2, 0.3]} 
+                radius={0.1} 
+                smoothness={4} 
+                position={[0.8, 0, 0]} 
+                castShadow
              >
-                 <meshStandardMaterial color="#ffffff" roughness={0.9} />
+                {leatherMaterial}
+             </RoundedBox>
+         </group>
+
+         {/* Mattress (Grey Sheets) */}
+         <mesh position={[0, 0.45, 0.1]}>
+            <boxGeometry args={[3.0, 0.25, 3.1]} />
+            <meshStandardMaterial color="#e0e0e0" roughness={0.8} />
+         </mesh>
+         
+         {/* Messy Duvet (Darker Grey) */}
+         {/* Draped over lower part */}
+         <RoundedBox 
+            args={[3.1, 0.3, 2.2]} 
+            radius={0.15} 
+            smoothness={8} 
+            position={[0, 0.55, 0.6]} 
+            castShadow
+         >
+            <meshStandardMaterial color="#9e9e9e" roughness={1} /> 
+         </RoundedBox>
+
+         {/* Textured Throw Blanket at foot of bed */}
+         <RoundedBox 
+            args={[3.2, 0.15, 1.0]} 
+            radius={0.1} 
+            smoothness={4} 
+            position={[0, 0.65, 1.2]} 
+            rotation={[0.05, 0, 0]}
+            castShadow
+         >
+             <meshStandardMaterial color="#424242" roughness={1} />
+         </RoundedBox>
+
+         {/* Pillows (Grey) */}
+         <group position={[0, 0.65, -1.1]} rotation={[0.2, 0, 0]}>
+             <RoundedBox 
+                args={[1.0, 0.25, 0.5]} 
+                radius={0.1} 
+                smoothness={8} 
+                position={[-0.65, 0, 0]}
+             >
+                 <meshStandardMaterial color="#bdbdbd" roughness={0.9} />
+             </RoundedBox>
+             <RoundedBox 
+                args={[1.0, 0.25, 0.5]} 
+                radius={0.1} 
+                smoothness={8} 
+                position={[0.65, 0, 0]}
+             >
+                 <meshStandardMaterial color="#bdbdbd" roughness={0.9} />
              </RoundedBox>
          </group>
       </group>
 
       {/* --- Nightstand (Left of bed) --- */}
-      <group position={[-2.2, 0, -1.2]}> {/* Moved left due to wider bed */}
-          <mesh position={[0, 0.3, 0]} castShadow>
-              <boxGeometry args={[0.8, 0.6, 0.8]} />
-              <meshStandardMaterial color="#4e342e" roughness={0.5} />
-          </mesh>
-          {/* Drawer Handle */}
-          <mesh position={[0, 0.4, 0.41]}>
-              <boxGeometry args={[0.2, 0.05, 0.02]} />
-              <meshStandardMaterial color="#aaa" metalness={0.8} />
+      <group position={[-2.4, 0, -1.2]}> {/* Moved left due to wider bed */}
+          <mesh position={[0, 0.25, 0]} castShadow>
+              <boxGeometry args={[0.8, 0.5, 0.8]} />
+              <meshStandardMaterial color="#212121" roughness={0.5} />
           </mesh>
           
           {/* Particle Lamp on top */}
-          <group position={[0, 0.6, 0]}>
+          <group position={[0, 0.5, 0]}>
               <ParticleLamp isOn={isLampOn} toggle={toggleLamp} />
           </group>
       </group>
