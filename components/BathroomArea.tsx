@@ -296,21 +296,43 @@ export const BathroomArea: React.FC<BathroomAreaProps> = ({
       </group>
 
 
-      {/* ================= ZONE 3: SHOWER ================= */}
+      {/* ================= ZONE 3: SHOWER & SEWER ================= */}
       <group position={[-7.0, 0, -6.75]}>
           <mesh position={[0, 0.02, 0]} receiveShadow>
               <boxGeometry args={[2.5, 0.05, 2.5]} />
               <meshStandardMaterial color="#eee" roughness={0.5} />
           </mesh>
 
-          <mesh position={[0, 0.03, 0]} rotation={[-Math.PI/2, 0, 0]}>
-              <circleGeometry args={[0.15, 16]} />
-              <meshStandardMaterial color="#888" metalness={0.5} />
-          </mesh>
-          <mesh position={[0, 0.031, 0]} rotation={[-Math.PI/2, 0, 0]}>
-              <ringGeometry args={[0.0, 0.12, 8]} />
-              <meshBasicMaterial color="#333" wireframe />
-          </mesh>
+          {/* Improved Sewer Drain (Grating look) */}
+          <group position={[0, 0.03, 0]}>
+              <mesh rotation={[-Math.PI/2, 0, 0]}>
+                  <circleGeometry args={[0.15, 16]} />
+                  <meshStandardMaterial color="#555" metalness={0.6} />
+              </mesh>
+              {/* Grate Lines */}
+              <group position={[0, 0.005, 0]} rotation={[-Math.PI/2, 0, 0]}>
+                  <mesh position={[0, 0, 0.01]}>
+                       <ringGeometry args={[0.12, 0.15, 16]} />
+                       <meshStandardMaterial color="#333" />
+                  </mesh>
+                  <mesh position={[0.05, 0, 0]}>
+                       <boxGeometry args={[0.01, 0.2, 0.01]} />
+                       <meshStandardMaterial color="#333" />
+                  </mesh>
+                  <mesh position={[-0.05, 0, 0]}>
+                       <boxGeometry args={[0.01, 0.2, 0.01]} />
+                       <meshStandardMaterial color="#333" />
+                  </mesh>
+                   <mesh position={[0, 0, 0]}>
+                       <boxGeometry args={[0.01, 0.24, 0.01]} />
+                       <meshStandardMaterial color="#333" />
+                  </mesh>
+                  <mesh position={[0, 0, 0]} rotation={[0, 0, Math.PI/2]}>
+                       <boxGeometry args={[0.01, 0.24, 0.01]} />
+                       <meshStandardMaterial color="#333" />
+                  </mesh>
+              </group>
+          </group>
           
           <mesh position={[1.25, 1.2, 0]} rotation={[0, 0, 0]}>
               <boxGeometry args={[0.05, 2.4, 2.5]} />

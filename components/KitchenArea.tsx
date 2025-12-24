@@ -15,6 +15,21 @@ const StoveFire = () => (
   </group>
 );
 
+// --- Sub-component: Standardized Burner ---
+const Burner = ({ isOn }: { isOn: boolean }) => (
+    <group>
+        <mesh>
+            <cylinderGeometry args={[0.15, 0.15, 0.02]} />
+            <meshStandardMaterial color="#333" />
+        </mesh>
+        <mesh position={[0, 0.015, 0]}>
+            <ringGeometry args={[0.1, 0.14, 16]} rotation={[-Math.PI/2, 0, 0]} />
+            <meshStandardMaterial color="#111" />
+        </mesh>
+        {isOn && <StoveFire />}
+    </group>
+);
+
 // --- Sub-component: Fridge Door with Hinge Logic ---
 const FridgeDoor = ({ isOpen, onClick, children, hingePosition, openRotation }: any) => {
     const ref = useRef<THREE.Group>(null);
@@ -73,53 +88,35 @@ export const KitchenArea = () => {
                         <meshStandardMaterial color="#111" metalness={0.6} roughness={0.4} />
                     </mesh>
                     
-                    {/* Burners */}
+                    {/* Identical Burners */}
+                    {/* Front Left */}
                     <group position={[-0.3, 0.03, 0.2]}>
-                         <mesh>
-                             <cylinderGeometry args={[0.15, 0.15, 0.02]} />
-                             <meshStandardMaterial color="#333" />
-                         </mesh>
-                         <mesh position={[0, 0.015, 0]}>
-                             <ringGeometry args={[0.1, 0.14, 16]} rotation={[-Math.PI/2, 0, 0]} />
-                             <meshStandardMaterial color="#111" />
-                         </mesh>
-                         {stoveState[0] && <StoveFire />}
+                         <Burner isOn={stoveState[0]} />
                     </group>
                     
+                    {/* Front Right */}
                     <group position={[0.3, 0.03, 0.2]}>
-                         <mesh>
-                             <cylinderGeometry args={[0.15, 0.15, 0.02]} />
-                             <meshStandardMaterial color="#333" />
-                         </mesh>
-                         <mesh position={[0, 0.015, 0]}>
-                             <ringGeometry args={[0.1, 0.14, 16]} rotation={[-Math.PI/2, 0, 0]} />
-                             <meshStandardMaterial color="#111" />
-                         </mesh>
-                         {stoveState[1] && <StoveFire />}
+                         <Burner isOn={stoveState[1]} />
                     </group>
 
+                    {/* Back Left */}
                     <group position={[-0.3, 0.03, -0.2]}>
-                         <mesh>
-                             <cylinderGeometry args={[0.1, 0.1, 0.02]} />
-                             <meshStandardMaterial color="#333" />
-                         </mesh>
-                         {stoveState[2] && <StoveFire />}
+                         <Burner isOn={stoveState[2]} />
                     </group>
 
+                    {/* Back Right */}
                     <group position={[0.3, 0.03, -0.2]}>
-                         <mesh>
-                             <cylinderGeometry args={[0.1, 0.1, 0.02]} />
-                             <meshStandardMaterial color="#333" />
-                         </mesh>
-                         {stoveState[3] && <StoveFire />}
+                         <Burner isOn={stoveState[3]} />
                     </group>
 
-                    {/* Knobs */}
+                    {/* Knobs - Controls correspond to burner positions */}
                     <group position={[0, -0.1, 0.51]}>
                          <mesh position={[0, 0, 0]}>
                              <boxGeometry args={[1.0, 0.15, 0.02]} />
                              <meshStandardMaterial color="#ddd" />
                          </mesh>
+                         
+                         {/* Control for Front Left (0) */}
                          <mesh 
                             position={[-0.3, 0, 0.02]} 
                             rotation={[Math.PI/2, 0, 0]}
@@ -131,6 +128,7 @@ export const KitchenArea = () => {
                              <meshStandardMaterial color={stoveState[0] ? "#ff4400" : "#333"} />
                          </mesh>
 
+                         {/* Control for Back Left (2) */}
                          <mesh 
                             position={[-0.1, 0, 0.02]} 
                             rotation={[Math.PI/2, 0, 0]}
@@ -142,6 +140,7 @@ export const KitchenArea = () => {
                              <meshStandardMaterial color={stoveState[2] ? "#ff4400" : "#333"} />
                          </mesh>
 
+                         {/* Control for Back Right (3) */}
                          <mesh 
                             position={[0.1, 0, 0.02]} 
                             rotation={[Math.PI/2, 0, 0]}
@@ -153,6 +152,7 @@ export const KitchenArea = () => {
                              <meshStandardMaterial color={stoveState[3] ? "#ff4400" : "#333"} />
                          </mesh>
 
+                         {/* Control for Front Right (1) */}
                          <mesh 
                             position={[0.3, 0, 0.02]} 
                             rotation={[Math.PI/2, 0, 0]}
@@ -285,40 +285,48 @@ export const KitchenArea = () => {
                  </group>
                  
                  <group position={[0, 1.1, 0.45]}>
+                      {/* Central Divider */}
                       <mesh>
                           <boxGeometry args={[0.05, 2.1, 0.1]} />
                           <meshStandardMaterial color="#fff" />
                       </mesh>
+
+                      {/* --- Freezer (Left) --- */}
                       <group position={[-0.45, 0, 0]}>
+                          {/* Shelf */}
                           <mesh position={[0, 0.5, 0]}>
                               <boxGeometry args={[0.8, 0.02, 0.5]} />
                               <meshStandardMaterial color="#fff" transparent opacity={0.5} />
                           </mesh>
-                          <mesh position={[0, 0.6, 0]}>
-                               <boxGeometry args={[0.3, 0.08, 0.3]} />
-                               <meshStandardMaterial color="#b71c1c" roughness={0.9} />
-                          </mesh>
-                           <mesh position={[0.2, 0.6, 0.1]}>
-                               <boxGeometry args={[0.3, 0.08, 0.3]} />
-                               <meshStandardMaterial color="#880e4f" roughness={0.9} />
-                          </mesh>
+                          {/* Drawer at bottom */}
+                          <group position={[0, -0.7, 0]}>
+                              {/* Drawer Face */}
+                              <mesh position={[0, 0, 0.2]}>
+                                  <boxGeometry args={[0.75, 0.4, 0.02]} />
+                                  <meshStandardMaterial color="#e0f7fa" transparent opacity={0.6} />
+                              </mesh>
+                              {/* Drawer Box */}
+                              <mesh position={[0, 0, 0]}>
+                                   <boxGeometry args={[0.75, 0.4, 0.45]} />
+                                   <meshBasicMaterial color="#e0f7fa" wireframe opacity={0.2} transparent />
+                              </mesh>
+                          </group>
                       </group>
+
+                      {/* --- Fridge (Right) --- */}
                       <group position={[0.45, 0, 0]}>
-                          <mesh position={[0, 0.5, 0]}>
+                          {/* Shelves - Empty */}
+                          <mesh position={[0, 0.6, 0]}>
                               <boxGeometry args={[0.8, 0.02, 0.5]} />
                               <meshStandardMaterial color="#fff" transparent opacity={0.5} />
                           </mesh>
-                          <mesh position={[-0.2, 0.6, 0.1]}>
-                              <sphereGeometry args={[0.07]} />
-                              <meshStandardMaterial color="#c62828" />
+                          <mesh position={[0, 0.1, 0]}>
+                              <boxGeometry args={[0.8, 0.02, 0.5]} />
+                              <meshStandardMaterial color="#fff" transparent opacity={0.5} />
                           </mesh>
-                           <mesh position={[-0.05, 0.6, 0.15]}>
-                              <sphereGeometry args={[0.07]} />
-                              <meshStandardMaterial color="#c62828" />
-                          </mesh>
-                           <mesh position={[0.2, 0.62, 0]}>
-                               <sphereGeometry args={[0.13]} />
-                               <meshStandardMaterial color="#a5d6a7" roughness={0.8} />
+                          <mesh position={[0, -0.4, 0]}>
+                              <boxGeometry args={[0.8, 0.02, 0.5]} />
+                              <meshStandardMaterial color="#fff" transparent opacity={0.5} />
                           </mesh>
                       </group>
                  </group>
